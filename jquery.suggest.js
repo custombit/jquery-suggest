@@ -81,7 +81,7 @@
         data: params,
         success: function(entries) {
           if ($this.option.queryCallback) {
-            entries = $this.$option.queryCallback(entries);
+            entries = $this.option.queryCallback(entries);
           }
           $.map(entries, function(entry) {
             $this.suggestions.push(entry);

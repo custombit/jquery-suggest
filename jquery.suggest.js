@@ -80,7 +80,9 @@
         url: $this.option.queryUrl,
         data: params,
         success: function(entries) {
-          $this.suggestions = [];
+          if ($this.$option.queryCallback) {
+            entries = $this.$option.queryCallback(entries);
+          }
           $.map(entries, function(entry) {
             $this.suggestions.push(entry);
           });

@@ -3,7 +3,7 @@ jquery-suggest
 
 A jQuery plugin for autosuggest dropdowns.
 
-Example
+##Example
 ```
 userSuggestTemplate = function(suggestion) {
   var html = '';
@@ -48,3 +48,6 @@ Template gets wrapped in a ``<ul>`` element, which is wrapped in a ``<div>`` wit
 - ``suggestionKey``: the attribute on the suggestion object that will be inserted immediately next to the indicator once an ``<li>`` item is selected. **required**
 
 Requires jQuery.
+
+##Demo
+http://jsfiddle.net/natearmstrong2/p2DWy/2/

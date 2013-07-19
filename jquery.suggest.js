@@ -31,6 +31,7 @@
     this.option = option;
     var $this = this;
     this.$element.on('keyup', function() {
+      $this.suggestions = [];
       if ($this.$element.text().indexOf($this.option.indicator) > -1 || $this.$element.val().indexOf($this.option.indicator) > -1) {
         if ($this.isTextArea()) {
           $this.cursorPosition = $this.getTextareaCursor(element);

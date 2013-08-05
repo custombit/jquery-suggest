@@ -18,18 +18,19 @@
 * limitations under the License.
 * ============================================================ */
 
-!function( $ ){
+!function($) {
 
   /* SUGGEST CLASS DEFINITION
    * ==================== */
-
   function Suggest(element, option) {
+
     element = $(element);
     this.$element = element;
     this.query = ''
     this.suggestions = [];
     this.option = option;
     var $this = this;
+
     this.$element.on('keyup', function() {
       $this.suggestions = [];
       if ($this.$element.text().indexOf($this.option.indicator) > -1 || $this.$element.val().indexOf($this.option.indicator) > -1) {
@@ -56,15 +57,15 @@
       } else {
         text = $this.$element.text() + ' ';
       }
-      space = text.lastIndexOf(' ', cursorPosition-1);
-      for (var i=cursorPosition; i>=0; i--) {
+      space = text.lastIndexOf(' ', cursorPosition - 1);
+      for (var i = cursorPosition; i >= 0; i--) {
         if (i == space) {
           $this.suggestions = [];
           $('div#suggest').empty();
           break;
         }
         if (text[i] == $this.option.indicator) {
-          var query = text.slice(i+1, text.indexOf(' ', i));
+          var query = text.slice(i + 1, text.indexOf(' ', i));
           $this.query = query;
           $this.showSuggestions();
           break;
@@ -76,7 +77,7 @@
       $('div#suggest').remove();
       $this.$element.after('<div id="suggest" class="suggestions"></div>');
       $('div#suggest').width($this.$element.width());
-      var params = { search: { suggest: true, term: $this.query }, queryParams: $this.option.queryParams }
+      var params = { search: { suggest: true, term: $this.query }, queryParams: $this.option.queryParams };
       $.ajax({
         url: $this.option.queryUrl,
         data: params,
@@ -101,7 +102,7 @@
     this.showPopup = function() {
       var suggestion_list = '<ul>';
       var suggestions;
-      for (i=0; i<$this.suggestions.length; i++) {
+      for (i = 0; i < $this.suggestions.length; i++) {
         suggestion = $this.suggestions[i];
         suggestion_list += $this.option.template(suggestion);
       }
@@ -116,14 +117,14 @@
         } else {
           text = $this.$element.text() + ' ';
         }
-        for (var i=$this.cursorPosition; i>=0; i--) {
+        for (var i = $this.cursorPosition; i >= 0; i--) {
           if (text[i] == $this.option.indicator) {
             var start = i;
             break;
           }
         }
         var end = text.indexOf(' ', start);
-        var newText = text.slice(0, start+1) + suggestion + text.slice(end, -1) + ' ';
+        var newText = text.slice(0, start + 1) + suggestion + text.slice(end, -1) + ' ';
         if ($this.isTextArea()) {
           text = $this.$element.val(newText);
         } else {
@@ -199,12 +200,13 @@
     this.isTextArea = function() {
       return $this.$element.is('textarea');
     }
+
   }
 
-  $.fn.suggest = function ( option ) {
-    return this.each(function () {
+  $.fn.suggest = function (option) {
+    return this.each(function() {
       new Suggest(this, option);
     });
   }
 
-}( window.jQuery );
+}(window.jQuery);

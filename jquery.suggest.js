@@ -22,18 +22,18 @@
 
   /* SUGGEST CLASS DEFINITION
    * ==================== */
-  function Suggest(element, option) {
+  function Suggest(element, options) {
 
     element = $(element);
     this.$element = element;
     this.query = ''
     this.suggestions = [];
-    this.option = option;
+    this.options = options;
     var $this = this;
 
     this.$element.on('keyup', function() {
       $this.suggestions = [];
-      if ($this.$element.text().indexOf($this.option.indicator) > -1 || $this.$element.val().indexOf($this.option.indicator) > -1) {
+      if ($this.$element.text().indexOf($this.options.indicator) > -1 || $this.$element.val().indexOf($this.options.indicator) > -1) {
         if ($this.isTextArea()) {
           $this.cursorPosition = $this.getTextareaCursor(element);
         } else {
@@ -64,7 +64,7 @@
           $('div#suggest').empty();
           break;
         }
-        if (text[i] == $this.option.indicator) {
+        if (text[i] == $this.options.indicator) {
           var query = text.slice(i + 1, text.indexOf(' ', i));
           $this.query = query;
           $this.showSuggestions();
@@ -77,13 +77,13 @@
       $('div#suggest').remove();
       $this.$element.after('<div id="suggest" class="suggestions"></div>');
       $('div#suggest').width($this.$element.width());
-      var params = { search: { suggest: true, term: $this.query }, queryParams: $this.option.queryParams };
+      var params = { search: { suggest: true, term: $this.query }, queryParams: $this.options.queryParams };
       $.ajax({
-        url: $this.option.queryUrl,
+        url: $this.options.queryUrl,
         data: params,
         success: function(entries) {
-          if ($this.option.queryCallback) {
-            entries = $this.option.queryCallback(entries);
+          if ($this.options.queryCallback) {
+            entries = $this.options.queryCallback(entries);
           }
           $.map(entries, function(entry) {
             $this.suggestions.push(entry);
@@ -92,7 +92,7 @@
             $('div#suggest').empty();
             return;
           } else {
-            $this.suggestions = $this.suggestions.slice(0, $this.option.maxNumberOfSuggestions || 100);
+            $this.suggestions = $this.suggestions.slice(0, $this.options.maxNumberOfSuggestions || 100);
             $this.showPopup();
           }
         }
@@ -104,12 +104,12 @@
       var suggestions;
       for (i = 0; i < $this.suggestions.length; i++) {
         suggestion = $this.suggestions[i];
-        suggestion_list += $this.option.template(suggestion);
+        suggestion_list += $this.options.template(suggestion);
       }
       suggestion_list += '</ul>';
       $('div#suggest').html((suggestion_list));
       $('.suggestions ul li').click(function() {
-        var suggestion = $this.suggestions[$(this).index()][$this.option.suggestionKey]; // save suggestion
+        var suggestion = $this.suggestions[$(this).index()][$this.options.suggestionKey]; // save suggestion
         // save full text
         var text;
         if ($this.isTextArea()) {
@@ -118,7 +118,7 @@
           text = $this.$element.text() + ' ';
         }
         for (var i = $this.cursorPosition; i >= 0; i--) {
-          if (text[i] == $this.option.indicator) {
+          if (text[i] == $this.options.indicator) {
             var start = i;
             break;
           }
@@ -203,9 +203,9 @@
 
   }
 
-  $.fn.suggest = function (option) {
+  $.fn.suggest = function (options) {
     return this.each(function() {
-      new Suggest(this, option);
+      new Suggest(this, options);
     });
   }
 

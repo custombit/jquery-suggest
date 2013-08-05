@@ -18,21 +18,23 @@
 * limitations under the License.
 * ============================================================ */
 
-!function( $ ){
+!function($) {
 
   /* SUGGEST CLASS DEFINITION
    * ==================== */
+  function Suggest(element, options) {
 
-  function Suggest(element, option) {
     element = $(element);
     this.$element = element;
     this.query = ''
     this.suggestions = [];
-    this.option = option;
+    this.options = options;
+    this.mostRecentRequestAt = null;
     var $this = this;
+
     this.$element.on('keyup', function() {
       $this.suggestions = [];
-      if ($this.$element.text().indexOf($this.option.indicator) > -1 || $this.$element.val().indexOf($this.option.indicator) > -1) {
+      if ($this.$element.text().indexOf($this.options.indicator) > -1 || $this.$element.val().indexOf($this.options.indicator) > -1) {
         if ($this.isTextArea()) {
           $this.cursorPosition = $this.getTextareaCursor(element);
         } else {
@@ -40,31 +42,40 @@
         }
         $this.getQuery($this.cursorPosition);
       }
-    }).click(function() {
+    }).on('click', function() {
       if ($this.isTextArea()) {
         $this.cursorPosition = $this.getTextareaCursor(element);
       } else {
         $this.cursorPosition = $this.getCursorPosition(element);
       }
       $this.getQuery($this.cursorPosition);
+    }).on('focusout', function() {
+      setTimeout(function() {
+        $('div#suggest').empty();
+      }, 200);
     });
 
     this.getQuery = function(cursorPosition) {
       var text, space;
       if ($this.isTextArea()) {
-        text = $this.$element.val() + ' ';
+        text = $this.$element.val();
       } else {
-        text = $this.$element.text() + ' ';
+        if (window.getSelection()) {
+          var sel = window.getSelection();
+          text = sel.anchorNode.data;
+        }
       }
-      space = text.lastIndexOf(' ', cursorPosition-1);
-      for (var i=cursorPosition; i>=0; i--) {
+      if (typeof text == 'undefined') { text = '' };
+      text += ' ';
+      space = text.lastIndexOf(' ', cursorPosition - 1);
+      for (var i = cursorPosition; i >= 0; i--) {
         if (i == space) {
           $this.suggestions = [];
           $('div#suggest').empty();
           break;
         }
-        if (text[i] == $this.option.indicator) {
-          var query = text.slice(i+1, text.indexOf(' ', i));
+        if (text[i] == $this.options.indicator) {
+          var query = text.slice(i + 1, text.indexOf(' ', i));
           $this.query = query;
           $this.showSuggestions();
           break;
@@ -75,14 +86,18 @@
     this.showSuggestions = function() {
       $('div#suggest').remove();
       $this.$element.after('<div id="suggest" class="suggestions"></div>');
-      $('div#suggest').width($this.$element.width());
-      var params = { search: { suggest: true, term: $this.query }, queryParams: $this.option.queryParams }
+      $('div#suggest').width($this.$element.outerWidth());
+      var params = { search: { suggest: true, term: $this.query }, queryParams: $this.options.queryParams };
+      $this.mostRecentRequestAt = Date.now();
+      var requestedAt = Date.now();
       $.ajax({
-        url: $this.option.queryUrl,
+        url: $this.options.queryUrl,
         data: params,
         success: function(entries) {
-          if ($this.option.queryCallback) {
-            entries = $this.option.queryCallback(entries);
+          if ($this.mostRecentRequestAt != requestedAt) { return; }
+          $this.mostRecentRequestAt = null;
+          if ($this.options.queryCallback) {
+            entries = $this.options.queryCallback(entries);
           }
           $.map(entries, function(entry) {
             $this.suggestions.push(entry);
@@ -91,7 +106,7 @@
             $('div#suggest').empty();
             return;
           } else {
-            $this.suggestions = $this.suggestions.slice(0, $this.option.maxNumberOfSuggestions || 100);
+            $this.suggestions = $this.suggestions.slice(0, $this.options.maxNumberOfSuggestions || 100);
             $this.showPopup();
           }
         }
@@ -101,33 +116,26 @@
     this.showPopup = function() {
       var suggestion_list = '<ul>';
       var suggestions;
-      for (i=0; i<$this.suggestions.length; i++) {
+      for (i = 0; i < $this.suggestions.length; i++) {
         suggestion = $this.suggestions[i];
-        suggestion_list += $this.option.template(suggestion);
+        suggestion_list += $this.options.template(suggestion);
       }
       suggestion_list += '</ul>';
       $('div#suggest').html((suggestion_list));
       $('.suggestions ul li').click(function() {
-        var suggestion = $this.suggestions[$(this).index()][$this.option.suggestionKey]; // save suggestion
-        // save full text
+        var replacement = $this.options.indicator + $this.suggestions[$(this).index()][$this.options.suggestionKey] + '&nbsp;';
         var text;
         if ($this.isTextArea()) {
-          text = $this.$element.val() + ' ';
+          text = $this.$element.val();
         } else {
-          text = $this.$element.text() + ' ';
+          text = $this.$element.html();
         }
-        for (var i=$this.cursorPosition; i>=0; i--) {
-          if (text[i] == $this.option.indicator) {
-            var start = i;
-            break;
-          }
-        }
-        var end = text.indexOf(' ', start);
-        var newText = text.slice(0, start+1) + suggestion + text.slice(end, -1) + ' ';
+        text += ' ';
+        newText = text.replace(new RegExp('\\' + $this.options.indicator + $this.query + '\\b'), replacement);
         if ($this.isTextArea()) {
           text = $this.$element.val(newText);
         } else {
-          text = $this.$element.text(newText);
+          text = $this.$element.html(newText);
         }
         $this.moveCursorToEnd($this.$element);
         $('div#suggest').empty();
@@ -199,12 +207,13 @@
     this.isTextArea = function() {
       return $this.$element.is('textarea');
     }
+
   }
 
-  $.fn.suggest = function ( option ) {
-    return this.each(function () {
-      new Suggest(this, option);
+  $.fn.suggest = function (options) {
+    return this.each(function() {
+      new Suggest(this, options);
     });
   }
 
-}( window.jQuery );
+}(window.jQuery);

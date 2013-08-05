@@ -29,6 +29,7 @@
     this.query = ''
     this.suggestions = [];
     this.options = options;
+    this.mostRecentRequestAt = null;
     var $this = this;
 
     this.$element.on('keyup', function() {
@@ -78,10 +79,14 @@
       $this.$element.after('<div id="suggest" class="suggestions"></div>');
       $('div#suggest').width($this.$element.outerWidth());
       var params = { search: { suggest: true, term: $this.query }, queryParams: $this.options.queryParams };
+      $this.mostRecentRequestAt = Date.now();
+      var requestedAt = Date.now();
       $.ajax({
         url: $this.options.queryUrl,
         data: params,
         success: function(entries) {
+          if ($this.mostRecentRequestAt != requestedAt) { return; }
+          $this.mostRecentRequestAt = null;
           if ($this.options.queryCallback) {
             entries = $this.options.queryCallback(entries);
           }

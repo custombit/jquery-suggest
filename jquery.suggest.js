@@ -56,8 +56,12 @@
       if ($this.isTextArea()) {
         text = $this.$element.val() + ' ';
       } else {
-        text = $this.$element.text() + ' ';
+        if (window.getSelection()) {
+          var sel = window.getSelection();
+          text = sel.baseNode.data;
+        }
       }
+      if (typeof text == 'undefined') { text = '' };
       space = text.lastIndexOf(' ', cursorPosition - 1);
       for (var i = cursorPosition; i >= 0; i--) {
         if (i == space) {

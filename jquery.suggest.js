@@ -76,7 +76,7 @@
     this.showSuggestions = function() {
       $('div#suggest').remove();
       $this.$element.after('<div id="suggest" class="suggestions"></div>');
-      $('div#suggest').width($this.$element.width());
+      $('div#suggest').width($this.$element.outerWidth());
       var params = { search: { suggest: true, term: $this.query }, queryParams: $this.options.queryParams };
       $.ajax({
         url: $this.options.queryUrl,

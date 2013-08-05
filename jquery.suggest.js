@@ -119,15 +119,15 @@
       suggestion_list += '</ul>';
       $('div#suggest').html((suggestion_list));
       $('.suggestions ul li').click(function() {
-        var suggestion = $this.suggestions[$(this).index()][$this.options.suggestionKey]; // save suggestion
-        // save full text
+        var replacement = $this.options.indicator + $this.suggestions[$(this).index()][$this.options.suggestionKey] + '&nbsp;';
         var text;
         if ($this.isTextArea()) {
-          text = $this.$element.val() + ' ';
+          text = $this.$element.val();
         } else {
-          text = $this.$element.html() + ' ';
+          text = $this.$element.html();
         }
-        newText = text.replace(new RegExp('\\' + $this.options.indicator + $this.query + '\\w*'), $this.options.indicator + suggestion);
+        text += ' ';
+        newText = text.replace(new RegExp('\\' + $this.options.indicator + $this.query + '\\w*'), replacement);
         if ($this.isTextArea()) {
           text = $this.$element.val(newText);
         } else {

@@ -42,13 +42,17 @@
         }
         $this.getQuery($this.cursorPosition);
       }
-    }).click(function() {
+    }).on('click', function() {
       if ($this.isTextArea()) {
         $this.cursorPosition = $this.getTextareaCursor(element);
       } else {
         $this.cursorPosition = $this.getCursorPosition(element);
       }
       $this.getQuery($this.cursorPosition);
+    }).on('focusout', function() {
+      setTimeout(function() {
+        $('div#suggest').empty();
+      }, 200);
     });
 
     this.getQuery = function(cursorPosition) {

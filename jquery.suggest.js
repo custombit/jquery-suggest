@@ -131,7 +131,7 @@
           text = $this.$element.html();
         }
         text += ' ';
-        newText = text.replace(new RegExp('\\' + $this.options.indicator + $this.query + '\\w*'), replacement);
+        newText = text.replace(new RegExp('\\' + $this.options.indicator + $this.query + '\\b'), replacement);
         if ($this.isTextArea()) {
           text = $this.$element.val(newText);
         } else {

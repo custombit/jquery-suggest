@@ -54,14 +54,15 @@
     this.getQuery = function(cursorPosition) {
       var text, space;
       if ($this.isTextArea()) {
-        text = $this.$element.val() + ' ';
+        text = $this.$element.val();
       } else {
         if (window.getSelection()) {
           var sel = window.getSelection();
-          text = sel.baseNode.data;
+          text = sel.anchorNode.data;
         }
       }
       if (typeof text == 'undefined') { text = '' };
+      text += ' ';
       space = text.lastIndexOf(' ', cursorPosition - 1);
       for (var i = cursorPosition; i >= 0; i--) {
         if (i == space) {
@@ -124,20 +125,13 @@
         if ($this.isTextArea()) {
           text = $this.$element.val() + ' ';
         } else {
-          text = $this.$element.text() + ' ';
+          text = $this.$element.html() + ' ';
         }
-        for (var i = $this.cursorPosition; i >= 0; i--) {
-          if (text[i] == $this.options.indicator) {
-            var start = i;
-            break;
-          }
-        }
-        var end = text.indexOf(' ', start);
-        var newText = text.slice(0, start + 1) + suggestion + text.slice(end, -1) + ' ';
+        newText = text.replace(new RegExp('\\' + $this.options.indicator + $this.query + '\\w*'), $this.options.indicator + suggestion);
         if ($this.isTextArea()) {
           text = $this.$element.val(newText);
         } else {
-          text = $this.$element.text(newText);
+          text = $this.$element.html(newText);
         }
         $this.moveCursorToEnd($this.$element);
         $('div#suggest').empty();

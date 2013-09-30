@@ -183,8 +183,8 @@
       // http://stackoverflow.com/questions/4233265/contenteditable-set-caret-at-the-end-of-the-text-cross-browser
       if (typeof window.getSelection != 'undefined' && typeof document.createRange != 'undefined') {
         var range = document.createRange();
-        range.selectNodeContents(element[0]);
-        range.collapse(false);
+        range.setStart(element[0], 1);
+        range.collapse(true);
         var sel = window.getSelection();
         sel.removeAllRanges();
         sel.addRange(range);

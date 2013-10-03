@@ -34,7 +34,7 @@
 
     this.$element.on('keyup', function() {
       $this.suggestions = [];
-      if ($this.$element.text().indexOf($this.options.indicator) > -1 || $this.$element.val().indexOf($this.options.indicator) > -1) {
+      if ($this.$element[$this.isTextArea() ? 'val' : 'text']().indexOf($this.options.indicator) > -1) {
         if ($this.isTextArea()) {
           $this.cursorPosition = $this.getTextareaCursor(element);
         } else {
@@ -76,8 +76,14 @@
         }
         if (text[i] == $this.options.indicator) {
           var query = text.slice(i + 1, text.indexOf(' ', i));
-          $this.query = query;
-          $this.showSuggestions();
+          if (typeof $this.options.minCharactersBeforeSuggestions != 'undefined') {
+            if (query.length >= $this.options.minCharactersBeforeSuggestions) {
+              $this.query = query;
+              $this.showSuggestions();
+            }
+          } else {
+            $this.showSuggestions();
+          }
           break;
         }
       }

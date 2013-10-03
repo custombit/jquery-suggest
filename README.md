@@ -46,6 +46,7 @@ Template gets wrapped in a ``<ul>`` element, which is wrapped in a ``<div>`` wit
 - ``maxNumberOfSuggestions``: **optional**; default is 100
 - ``template``: html that will be injected into a ``<ul>`` element. Example above. **required**
 - ``suggestionKey``: the attribute on the suggestion object that will be inserted immediately next to the indicator once an ``<li>`` item is selected. **required**
+- ``minCharactersBeforeSuggestions``: minimum number of characters after the `indicator` required in order for suggestions to be shown. **optional**
 
 Requires jQuery.
 

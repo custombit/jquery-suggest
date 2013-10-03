@@ -123,22 +123,20 @@
       suggestion_list += '</ul>';
       $('div#suggest').html((suggestion_list));
       $('.suggestions ul li').click(function() {
-        var replacement = $this.options.indicator + $this.suggestions[$(this).index()][$this.options.suggestionKey] + '&nbsp;';
+        var replacement = $this.options.indicator + $this.suggestions[$(this).index()][$this.options.suggestionKey];
         var text;
         if ($this.isTextArea()) {
           text = $this.$element.val();
         } else {
           text = $this.$element.html();
         }
+        if (text.slice(-4) === '<br>') text = text.slice(0, -4);
         text += ' ';
         newText = text.replace(new RegExp('\\' + $this.options.indicator + $this.query + '\\b'), replacement);
-        if ($this.isTextArea()) {
-          text = $this.$element.val(newText);
-        } else {
-          text = $this.$element.html(newText);
-        }
+        $this.$element[$this.isTextArea() ? 'val' : 'html']($.trim(newText) + ($this.isTextArea() ? ' ' : '&nbsp;'));
         $this.moveCursorToEnd($this.$element);
         $('div#suggest').empty();
+        $this.$element.trigger('change');
       });
     }
 
@@ -191,8 +189,8 @@
       // http://stackoverflow.com/questions/4233265/contenteditable-set-caret-at-the-end-of-the-text-cross-browser
       if (typeof window.getSelection != 'undefined' && typeof document.createRange != 'undefined') {
         var range = document.createRange();
-        range.setStart(element[0], 1);
-        range.collapse(true);
+        range.selectNodeContents(element[0]);
+        range.collapse(false);
         var sel = window.getSelection();
         sel.removeAllRanges();
         sel.addRange(range);
@@ -202,6 +200,10 @@
         textRange.collapse(false);
         textRange.select();
       }
+      var v = element.val();
+      element.val('');
+      element.val(v);
+      element.focus();
     }
 
     this.isTextArea = function() {
